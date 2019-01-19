@@ -9,11 +9,11 @@ import (
 // flag.Usage or other meaningful parts of the application
 func EnvironmentDescription(obj interface{}) (map[string]string, error) {
 	v := reflect.ValueOf(obj)
-	if !(v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Struct) || v.Kind() != reflect.Struct {
-		return nil, ErrInvalidType
-	}
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return nil, ErrInvalidType
 	}
 	entries := make(map[string]string, 0)
 	for i := 0; i < v.NumField(); i++ {
