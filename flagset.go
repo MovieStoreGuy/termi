@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strings"
 	"text/template"
 
 	env "github.com/Netflix/go-env"
@@ -101,7 +102,7 @@ func (s *set) Parse(args []string) ([]string, error) {
 			break
 		}
 		for _, flag := range s.flags {
-			if flag.IsFlag(args[index]) {
+			if strings.HasPrefix(args[index], "-") && flag.IsFlag(args[index]) {
 				if index+1 >= len(args) {
 					return remainder, errors.New("missing required field on end of args")
 				}
