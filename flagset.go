@@ -52,7 +52,6 @@ type set struct {
 
 func NewFlagSet() FlagSet {
 	s := &set{}
-	s.Register(NewString().SetDescription("Shows help message").SetName("help").SetName("h"))
 	return s
 }
 

@@ -48,7 +48,7 @@ func (b *basic) String(t interface{}) string {
 		}
 		return values
 	}
-	return fmt.Sprintf("%v (type:%v) -- %s", toArray(b.names), t, b.description)
+	return fmt.Sprintf("%v\t(type:%v)\n└──\t%s", toArray(b.names), t, b.description)
 }
 
 func (b *basic) setName(name string) {
