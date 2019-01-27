@@ -51,7 +51,9 @@ type set struct {
 }
 
 func NewFlagSet() FlagSet {
-	return &set{}
+	s := &set{}
+	s.Register(NewString().SetDescription("Shows help message").SetName("help").SetName("h"))
+	return s
 }
 
 func (s *set) PrintDescription(w io.Writer) error {
