@@ -1,6 +1,7 @@
 package termi
 
 import (
+	"errors"
 	"io"
 	"os"
 	"path"
@@ -89,18 +90,29 @@ func (s *set) ParseEnvironment() error {
 }
 
 func (s *set) Parse(args []string) ([]string, error) {
-	var remainder []string
-	for i := 0; i < len(args)-1; i++ {
-		for _, flag := range s.flags {
-			if !flag.IsFlag(args[i]) {
-				remainder = append(remainder, args[i])
-				continue
-			}
-			if err := flag.Set(args[i+1]); err != nil {
-				return remainder, err
-			}
-			i++
+	var (
+		index     int
+		remainder []string
+	)
+	for {
+	start:
+		if index >= len(args) {
+			break
 		}
+		for _, flag := range s.flags {
+			if flag.IsFlag(args[index]) {
+				if index+1 >= len(args) {
+					return remainder, errors.New("missing required field on end of args")
+				}
+				if err := flag.Set(args[index+1]); err != nil {
+					return remainder, err
+				}
+				index += 2
+				goto start
+			}
+		}
+		remainder = append(remainder, args[index])
+		index++
 	}
 	return remainder, nil
 }

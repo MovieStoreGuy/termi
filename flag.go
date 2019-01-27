@@ -1,6 +1,7 @@
 package termi
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -39,6 +40,9 @@ func (n *Integer) IsFlag(name string) bool {
 }
 
 func (n *Integer) Set(value string) error {
+	if !n.value.IsValid() {
+		return errors.New("unable to update value if value is not valid")
+	}
 	v, err := strconv.Atoi(value)
 	n.value.Set(reflect.ValueOf(v))
 	return err
@@ -70,7 +74,7 @@ func (n *Integer) String() string {
 		}
 		return values
 	}
-	return fmt.Sprintf("flags: %v -- %s", toArray(n.names), n.description)
+	return fmt.Sprintf("flags: %v (type:%v) -- %s", toArray(n.names), reflect.TypeOf(n).Elem(), n.description)
 }
 
 type String struct {
@@ -91,6 +95,9 @@ func (n *String) IsFlag(name string) bool {
 }
 
 func (n *String) Set(value string) error {
+	if !n.value.IsValid() {
+		return errors.New("unable to update value if value is not valid")
+	}
 	n.value.Set(reflect.ValueOf(value))
 	return nil
 }
@@ -121,5 +128,5 @@ func (n *String) String() string {
 		}
 		return values
 	}
-	return fmt.Sprintf("flags: %v -- %s", toArray(n.names), n.description)
+	return fmt.Sprintf("flags: %v (type:%v) -- %s", toArray(n.names), reflect.TypeOf(n).Elem(), n.description)
 }
