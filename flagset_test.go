@@ -1,6 +1,7 @@
 package termi_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/MovieStoreGuy/termi"
@@ -25,5 +26,34 @@ func TestFlagSet_Parse(t *testing.T) {
 	if len(remainder) != 1 {
 		t.Logf("Remainder: %+v, creatureType: %s\n", remainder, creatureType)
 		t.Fatal("Expected only one value to be remaining")
+	}
+	if creatureType != "human" {
+		t.Fatal("Expected creatureType to be updated")
+	}
+}
+
+func TestFlagSet_Description(t *testing.T) {
+	const (
+		description = `{{.name}}
+GoVersion: {{.GoVersion}}
+
+Environment
+{{range $var, $description := .environments}} {{$var}} {{$description}}
+{{end}}
+Flags:
+{{range $flag := .flags }} {{$flag}}
+{{end}}
+`
+	)
+	defer func() {
+		if r := recover(); r != nil {
+			t.Fatal("Recovered from: ", r)
+		}
+	}()
+	fs := termi.NewFlagSet()
+	fs.SetDescription(description)
+	fs.Register(termi.NewString().SetName("Name").SetName("name").SetDescription("an example name"))
+	if err := fs.PrintDescription(os.Stderr); err != nil {
+		t.Fatal(err)
 	}
 }
