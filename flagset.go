@@ -102,14 +102,38 @@ func (s *set) Parse(args []string) ([]string, error) {
 			break
 		}
 		for _, flag := range s.flags {
+			// Needed to ensure I don't accidently consume a non flag value
 			if strings.HasPrefix(args[index], "-") && flag.IsFlag(args[index]) {
-				if index+1 >= len(args) {
-					return remainder, errors.New("missing required field on end of args")
+				consumedArgs := 1
+				switch flag.(type) {
+				case *Boolean:
+					switch {
+					case index+1 >= len(args):
+						if err := flag.Set("true"); err != nil {
+							return remainder, err
+						}
+					default:
+						if err := flag.Set(args[index+1]); err != nil {
+							switch err {
+							case ErrorMissingBoolean:
+								if err := flag.Set("true"); err != nil {
+									return remainder, err
+								}
+							}
+						} else {
+							consumedArgs++
+						}
+					}
+				default:
+					if index+1 >= len(args) {
+						return remainder, errors.New("missing required argument on end of list")
+					}
+					if err := flag.Set(args[index+1]); err != nil {
+						return remainder, err
+					}
+					consumedArgs++
 				}
-				if err := flag.Set(args[index+1]); err != nil {
-					return remainder, err
-				}
-				index += 2
+				index += consumedArgs
 				goto start
 			}
 		}

@@ -6,6 +6,11 @@ import (
 	"strconv"
 )
 
+var (
+	// ErrorMissingBoolean allows for checking if we need to stumble when parsing flag arguments
+	ErrorMissingBoolean = errors.New("non boolean value parsed")
+)
+
 type Boolean struct {
 	*basic
 }
@@ -29,6 +34,9 @@ func (b *Boolean) Set(value string) error {
 		return errors.New("unable to update value if value is not valid")
 	}
 	bool, err := strconv.ParseBool(value)
+	if err != nil {
+		return ErrorMissingBoolean
+	}
 	b.value.Set(reflect.ValueOf(bool))
 	return err
 }
