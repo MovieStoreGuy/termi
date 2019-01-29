@@ -1,5 +1,6 @@
 # Termi
 [![Go Report Card](https://goreportcard.com/badge/github.com/MovieStoreGuy/termi)](https://goreportcard.com/report/github.com/MovieStoreGuy/termi)
+[![Maintainability](https://api.codeclimate.com/v1/badges/901065b20a0021ba2ee9/maintainability)](https://codeclimate.com/github/MovieStoreGuy/termi/maintainability)
 [![GoDoc](https://godoc.org/github.com/MovieStoreGuy/termi?status.svg)](https://godoc.org/github.com/MovieStoreGuy/termi)  
 
 Termi is a library that enables applications flag parsing and help messages made simple.
