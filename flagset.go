@@ -18,10 +18,10 @@ type FlagSet interface {
 	// SetDescription allows you to parse a text/template
 	// in order to printed a more meaningful description
 	// By default, the variables are:
-	// - name : name of the application
-	// - GoVersion : the version of go being used
+	// - name         : name of the application
+	// - GoVersion    : the version of go being used
 	// - environments : a map of the variables that can be set by an env
-	// - flags : All the flags defined in the Set
+	// - flags        : All the flags defined in the Set
 	SetDescription(description string)
 
 	// SetEnvironment allows you set parse a variable that is used
@@ -94,6 +94,7 @@ func (s *set) ParseEnvironment() error {
 func (s *set) Parse(args []string) ([]string, error) {
 	var (
 		index     int
+		process   = true
 		remainder []string
 	)
 	for {
@@ -101,9 +102,12 @@ func (s *set) Parse(args []string) ([]string, error) {
 		if index >= len(args) {
 			break
 		}
+		if args[index] == "--" {
+			process = false
+		}
 		for _, flag := range s.flags {
 			// Needed to ensure I don't accidently consume a non flag value
-			if strings.HasPrefix(args[index], "-") && flag.IsFlag(args[index]) {
+			if strings.HasPrefix(args[index], "-") && flag.IsFlag(args[index]) && process {
 				consumedArgs := 1
 				switch flag.(type) {
 				case *Boolean:
