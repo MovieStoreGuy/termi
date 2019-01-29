@@ -11,6 +11,8 @@ var (
 	ErrorMissingBoolean = errors.New("non boolean value parsed")
 )
 
+// Boolean defines an optional flag type which will default to true if the option is missing
+// come parsing time.
 type Boolean struct {
 	*basic
 }

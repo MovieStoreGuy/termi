@@ -57,3 +57,33 @@ Flags:
 		t.Fatal(err)
 	}
 }
+
+func TestFlagSet_OptionalBooleans(t *testing.T) {
+	var (
+		enabled = false
+		fs      = termi.NewFlagSet()
+	)
+	fs.Register(termi.NewBoolean().
+		SetValue(&enabled).
+		SetDescription("To turn on something").
+		SetName("enable"))
+	if _, err := fs.Parse([]string{"--enable"}); err != nil {
+		t.Fatal("Should allow for option values to be parse but got ", err)
+	}
+	if !enabled {
+		t.Fatal("Did not set enable to true")
+	}
+	if _, err := fs.Parse([]string{"--enable", "false"}); err != nil {
+		t.Fatal("should allow for explicit setting of boolean variables but got ", err)
+	}
+	if enabled {
+		t.Error("Did not set enable to false")
+	}
+	remainder, err := fs.Parse([]string{"--enable", "fortnight"})
+	if err != nil {
+		t.Fatal("Should not try consume fortnight as a value for a boolean flag, got ", err)
+	}
+	if len(remainder) != 1 && remainder[0] != "fortnight" {
+		t.Error("Incorrect values returned, got ", remainder)
+	}
+}
