@@ -115,14 +115,14 @@ func (s *set) Parse(args []string) ([]string, error) {
 					switch {
 					case index+1 >= len(args):
 						if err := flag.Set("true"); err != nil {
-							return remainder, err
+							panic(err)
 						}
 					default:
 						if err := flag.Set(args[index+1]); err != nil {
 							switch err {
 							case ErrorMissingBoolean:
 								if err := flag.Set("true"); err != nil {
-									return remainder, err
+									panic(err)
 								}
 							}
 						} else {
