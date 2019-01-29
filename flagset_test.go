@@ -87,3 +87,27 @@ func TestFlagSet_OptionalBooleans(t *testing.T) {
 		t.Error("Incorrect values returned, got ", remainder)
 	}
 }
+
+func TestFlagSet_Terminator(t *testing.T) {
+	var (
+		fs = termi.NewFlagSet()
+	)
+	fs.Register(termi.NewBoolean().
+		SetValue(new(bool)).
+		SetName("help").
+		SetDescription("shows help message"))
+	remainder, err := fs.Parse([]string{"strop", "--"})
+	if err != nil {
+		t.Fatal("Experienced issue:", err)
+	}
+	if len(remainder) != 1 && remainder[0] != "strop" {
+		t.Error("Incorrect level of arguments returned, got:", remainder)
+	}
+	remainder, err = fs.Parse([]string{"strop", "--", "--help"})
+	if err != nil {
+		t.Fatal("Experienced issue:", err)
+	}
+	if len(remainder) != 2 && remainder[1] != "--help" {
+		t.Error("Processed args after the terminator, got: ", remainder)
+	}
+}

@@ -33,7 +33,9 @@ type FlagSet interface {
 	Register(flag Flag) FlagSet
 
 	// Parse will read all the strings passed and update flags when applied
-	// then return the unused args
+	// then return the unused args.
+	// When "--" is read in the args list, in remaining args will be returned unprocessed
+	// after that point.
 	Parse(args []string) ([]string, error)
 
 	// ParseEnvironment will gather all environment variables and apply the values
@@ -94,7 +96,6 @@ func (s *set) ParseEnvironment() error {
 func (s *set) Parse(args []string) ([]string, error) {
 	var (
 		index     int
-		process   = true
 		remainder []string
 	)
 	for {
@@ -103,11 +104,11 @@ func (s *set) Parse(args []string) ([]string, error) {
 			break
 		}
 		if args[index] == "--" {
-			process = false
+			return append(remainder, args[index+1:]...), nil
 		}
 		for _, flag := range s.flags {
-			// Needed to ensure I don't accidently consume a non flag value
-			if strings.HasPrefix(args[index], "-") && flag.IsFlag(args[index]) && process {
+			// Needed to ensure I don't accidentally consume a non flag value
+			if strings.HasPrefix(args[index], "-") && flag.IsFlag(args[index]) {
 				consumedArgs := 1
 				switch flag.(type) {
 				case *Boolean:
