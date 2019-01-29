@@ -1,7 +1,6 @@
 package termi
 
 import (
-	"errors"
 	"io"
 	"os"
 	"path"
@@ -94,58 +93,61 @@ func (s *set) ParseEnvironment() error {
 }
 
 func (s *set) Parse(args []string) ([]string, error) {
-	var (
-		index     int
-		remainder []string
-	)
-	for {
-	start:
-		if index >= len(args) {
-			break
-		}
+	var remainder []string
+	for index := 0; index < len(args); index++ {
 		if args[index] == "--" {
 			return append(remainder, args[index+1:]...), nil
 		}
-		for _, flag := range s.flags {
-			// Needed to ensure I don't accidentally consume a non flag value
-			if strings.HasPrefix(args[index], "-") && flag.IsFlag(args[index]) {
-				consumedArgs := 1
-				switch flag.(type) {
-				case *Boolean:
-					switch {
-					case index+1 >= len(args):
-						if err := flag.Set("true"); err != nil {
-							panic(err)
-						}
-					default:
-						if err := flag.Set(args[index+1]); err != nil {
-							switch err {
-							case ErrorMissingBoolean:
-								if err := flag.Set("true"); err != nil {
-									panic(err)
-								}
-							}
-						} else {
-							consumedArgs++
-						}
-					}
-				default:
-					if index+1 >= len(args) {
-						return remainder, errors.New("missing required argument on end of list")
-					}
-					if err := flag.Set(args[index+1]); err != nil {
-						return remainder, err
-					}
-					consumedArgs++
-				}
-				index += consumedArgs
-				goto start
-			}
+		var (
+			name  = args[index]
+			value string
+		)
+		if index+1 < len(args) {
+			value = args[index+1]
 		}
-		remainder = append(remainder, args[index])
-		index++
+		count, err := s.processFlag(name, value)
+		if err != nil {
+			return remainder, err
+		}
+		if count == 0 {
+			remainder = append(remainder, args[index])
+		}
+		index += count
 	}
 	return remainder, nil
+}
+
+func (s *set) processFlag(name, arg string) (int, error) {
+	if !strings.HasPrefix(name, "-") {
+		return 0, nil
+	}
+	count := 0
+	for _, flag := range s.flags {
+		if !flag.IsFlag(name) {
+			continue
+		}
+		// Boolean is a special case since it most often doesn't require an argument
+		// when supplying flags and can be assume to set the variable to true by design.
+		switch flag.(type) {
+		case *Boolean:
+			err := flag.Set(arg)
+			switch err {
+			case ErrorMissingBoolean:
+				flag.Set("true")
+				count = 1
+			case nil:
+				count = 2
+			default:
+				return 0, err
+			}
+		default:
+			if err := flag.Set(arg); err != nil {
+				return 0, err
+			}
+			count = 2
+		}
+	}
+	return count, nil
 }
 
 func (s *set) Register(f Flag) FlagSet {

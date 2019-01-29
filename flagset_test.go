@@ -83,7 +83,7 @@ func TestFlagSet_OptionalBooleans(t *testing.T) {
 	if err != nil {
 		t.Fatal("Should not try consume fortnight as a value for a boolean flag, got ", err)
 	}
-	if len(remainder) != 1 && remainder[0] != "fortnight" {
+	if len(remainder) > 1 && remainder[0] != "fortnight" {
 		t.Error("Incorrect values returned, got ", remainder)
 	}
 }
@@ -107,7 +107,7 @@ func TestFlagSet_Terminator(t *testing.T) {
 	if err != nil {
 		t.Fatal("Experienced issue:", err)
 	}
-	if len(remainder) != 2 && remainder[1] != "--help" {
+	if len(remainder) > 2 && remainder[1] != "--help" {
 		t.Error("Processed args after the terminator, got: ", remainder)
 	}
 }
