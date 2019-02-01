@@ -58,5 +58,5 @@ func (i *Integer) SetName(name string) Flag {
 }
 
 func (i *Integer) String() string {
-	return i.basic.String("string")
+	return i.basic.String("integer")
 }
