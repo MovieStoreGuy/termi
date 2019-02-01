@@ -3,6 +3,7 @@ package termi
 import (
 	"fmt"
 	"reflect"
+	"time"
 )
 
 // NewFlag is a generic function that will return the correct concrete flag type
@@ -18,6 +19,8 @@ func NewFlag(value interface{}) (Flag, error) {
 		f = NewUsignedInteger().SetValue(value)
 	case *bool:
 		f = NewBoolean().SetValue(value)
+	case *time.Duration:
+		f = NewDuration().SetValue(value)
 	default:
 		return f, fmt.Errorf("unable to convert value (%v) to concrete flag type", reflect.ValueOf(value).Type())
 	}
