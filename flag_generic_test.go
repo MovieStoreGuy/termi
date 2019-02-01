@@ -15,10 +15,17 @@ func TestGenericFlag(t *testing.T) {
 			t.Fatal(r)
 		}
 	}()
-	termi.Must(termi.NewFlag(&uid)).
+	f := termi.Must(termi.NewFlag(&uid)).
 		SetName("uid").
 		SetName("user").
 		SetDescription("user id to passed")
+	if err := f.Set("0078"); err != nil {
+		t.Fatal(err)
+	}
+	if uid != uint(78) {
+		t.Error("Values do not match")
+		t.Errorf("%v vs %v\n", uid, uint(78))
+	}
 }
 
 func TestUnsupportedValue(t *testing.T) {

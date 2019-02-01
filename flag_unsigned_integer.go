@@ -29,7 +29,7 @@ func (u *UnsignedInteger) Set(value string) error {
 		return errors.New("unable to update value if value is not valid")
 	}
 	v, err := strconv.ParseUint(value, 10, strconv.IntSize)
-	u.value.Set(reflect.ValueOf(v))
+	u.value.Set(reflect.ValueOf(uint(v)))
 	return err
 }
 
