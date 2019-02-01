@@ -52,7 +52,11 @@ Flags:
 	}()
 	fs := termi.NewFlagSet()
 	fs.SetDescription(description)
-	fs.Register(termi.NewString().SetName("Name").SetName("name").SetDescription("an example name"))
+	fs.Register(termi.NewString().
+		SetValue(new(string)).
+		SetName("Name").
+		SetName("name").
+		SetDescription("an example name"))
 	if err := fs.PrintDescription(os.Stderr); err != nil {
 		t.Fatal(err)
 	}
