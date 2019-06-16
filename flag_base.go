@@ -33,7 +33,7 @@ func (b *basic) String(t interface{}) string {
 	if b.value.IsValid() {
 		defaultValue = b.value.Interface()
 	}
-	return fmt.Sprintf("%v\t(type:%v)\n└──\t%s (default: %v)", toArray(b.names), t, b.description, defaultValue)
+	return fmt.Sprintf("%v	(type:%v)└──	%s (default: \"%v\")", toArray(b.names), t, b.description, defaultValue)
 }
 
 func (b *basic) setName(name string) {
